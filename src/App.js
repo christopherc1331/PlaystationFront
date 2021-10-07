@@ -72,7 +72,10 @@ function App() {
                     </div>
                 ))}
                 <div className="button-row row-border">
-
+                    <div className="button-container">
+                        <div className="button">Cancel</div>
+                        <div className="button save">Save</div>
+                    </div>
                 </div>
             </div>
         </div>
