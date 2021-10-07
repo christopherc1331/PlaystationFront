@@ -1,0 +1,42 @@
+$lightDarkGrey: rgba(132, 132, 132, 0.46);
+$darkBlue: rgba(18, 41, 123, 0.88);
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 100px;
+
+    .pop-up-box {
+        width: 1200px;
+        height: 400px;
+        .header {
+            height: 50px;
+            background-color: $darkBlue;
+            color: white;
+            font-size: 2rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding:  5px 10px 5px 55px;
+            .white-rect {
+                width: 25px;
+                height: 4px;
+                background-color: white;
+            }
+        }
+        .box-bottom {
+            height: 100%;
+            border-bottom: $lightDarkGrey solid 2px;
+            border-left: $lightDarkGrey solid 2px;
+            border-right: $lightDarkGrey solid 2px;
+            border-radius: 1px;
+            .bottom-inner-box {
+                height: 7px;
+                width: 100%;
+                border-bottom: $lightDarkGrey solid 2px;
+            }
+        }
+    }
+}
