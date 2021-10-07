@@ -6,6 +6,8 @@ import "./App.scss";
 function App() {
 
     const [featureFlags, setFeatureFlags] = useState([]);
+    const [originalFeatureFlags, setOriginalFeatureFlags] = useState([]);
+    const [cancelled, setCancelled] = useState(false);
 
     useEffect(() => {
         axios.get("http://localhost:8080/featureflags")
@@ -15,6 +17,7 @@ function App() {
                     dataPoint["valueArr"] = dataPoint["valueArr"].map(strNum => parseInt(strNum) === 1);
                 }
                 setFeatureFlags(res.data);
+                setOriginalFeatureFlags(res.data);
             })
     }, [])
 
@@ -23,13 +26,30 @@ function App() {
         const updatedFeatureFlags = featureFlags
             .map(feature => {
                 if (feature["name"] === name) {
-                    feature["valueArr"][index] = checked;
+                    feature["valueArr"][index] = !feature["valueArr"][index];
                 }
                 return feature;
             });
 
         setFeatureFlags(updatedFeatureFlags);
     }
+
+    console.log("cancelled!!!!", cancelled);
+    console.log("featureFlags!!!!", featureFlags);
+    console.log("originalFeatureFlags!!!!", originalFeatureFlags);
+    console.log("featureFlags == originalFeatureFlags!!!!", featureFlags == originalFeatureFlags);
+
+    useEffect(() => {
+        console.log("in UseEffect!");
+        if (cancelled) {
+            console.log("in UseEffect if statement!");
+            setFeatureFlags(originalFeatureFlags);
+        }
+        setTimeout(() => {
+            setCancelled(false);
+        },[2000])
+
+    }, [cancelled]);
 
   return (
     <div className="container">
@@ -40,9 +60,7 @@ function App() {
         </div>
         <div className="box-bottom">
             <div className="bottom-inner-box">
-                <div className="empty-row row-border">
-
-                </div>
+                <div className="empty-row row-border" />
                 <div className="header-row row-border">
                     <div className="row-container">
                         <div className="left">
@@ -57,7 +75,23 @@ function App() {
                         </div>
                     </div>
                 </div>
-                {featureFlags.map(featureFlag => (
+                {cancelled ?
+                    originalFeatureFlags.map(featureFlag => (
+                        <div className="check-box-row row-border">
+                            <div className="row-container">
+                                <div className="left">
+                                    <h3 className="labels">{featureFlag["name"]}</h3>
+                                </div>
+                                <div className="right">
+                                    {featureFlag["valueArr"].map((value, index) => (
+                                        <input name={featureFlag["name"]} type="checkbox" checked={value} onChange={(e) => handleCheckBox(e, index)} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                    :
+                    featureFlags.map(featureFlag => (
                     <div className="check-box-row row-border">
                         <div className="row-container">
                             <div className="left">
@@ -73,7 +107,7 @@ function App() {
                 ))}
                 <div className="button-row row-border">
                     <div className="button-container">
-                        <div className="button">Cancel</div>
+                        <div className="button" onClick={() => setCancelled(true)}>Cancel</div>
                         <div className="button save">Save</div>
                     </div>
                 </div>

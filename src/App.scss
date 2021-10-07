@@ -88,6 +88,9 @@ $paperDarkerGrey: rgba(236, 235, 235, 0.88);
                             background-color: $lighterBlue;
                             color: white;
                         }
+                        .save:active {
+                            background-color: $darkBlue;
+                        }
                     }
                 }
             }
