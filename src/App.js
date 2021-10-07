@@ -1,6 +1,20 @@
+import React, {useEffect, useState} from "react";
+import axios from "axios";
 import "./App.scss";
 
+
 function App() {
+
+    const [featureFlags, setFeatureFlags] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/featureflags")
+            .then(res => {
+                setFeatureFlags(res.data);
+                console.log(res);
+            })
+    }, [])
+
   return (
     <div className="container">
       <div className="pop-up-box">
@@ -10,10 +24,10 @@ function App() {
         </div>
         <div className="box-bottom">
             <div className="bottom-inner-box">
-                <div className="empty-row">
+                <div className="empty-row row-border">
 
                 </div>
-                <div className="header-row">
+                <div className="header-row row-border">
                     <div className="row-container">
                         <div className="left">
                             <h3>Region</h3>
@@ -27,10 +41,21 @@ function App() {
                         </div>
                     </div>
                 </div>
-                <div className="check-box-row">
-
-                </div>
-                <div className="button-row">
+                {featureFlags.map(featureFlag => (
+                    <div className="check-box-row row-border">
+                        <div className="row-container">
+                            <div className="left">
+                                <h3 className="labels">{featureFlag["name"]}</h3>
+                            </div>
+                            <div className="right">
+                                {featureFlag["valueArr"].map(value => (
+                                    <input type="checkbox" value={parseInt(value) === 1} />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                <div className="button-row row-border">
 
                 </div>
             </div>
