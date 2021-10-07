@@ -1,5 +1,7 @@
 $lightDarkGrey: rgba(132, 132, 132, 0.46);
 $darkBlue: rgba(18, 41, 123, 0.88);
+$paperGrey: rgba(248, 248, 248, 0.44);
+$paperDarkerGrey: rgba(255, 252, 252, 0.64);
 
 .container {
     display: flex;
@@ -32,11 +34,40 @@ $darkBlue: rgba(18, 41, 123, 0.88);
             border-left: $lightDarkGrey solid 2px;
             border-right: $lightDarkGrey solid 2px;
             border-radius: 1px;
+            display: flex;
+            align-items: flex-end;
+            background-color: $paperGrey;
             .bottom-inner-box {
-                height: 7px;
+                height: 100%;
                 width: 100%;
-                border-bottom: $lightDarkGrey solid 2px;
+                .empty-row {
+                    height: 2%;
+                    border-bottom: $lightDarkGrey solid 2px;
+                }
+                .header-row {
+                    height: 12%;
+                    padding: 7px 20px;
+                    border-bottom: $lightDarkGrey solid 2px;
+                }
             }
         }
     }
+}
+
+
+.row-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    h3 {
+        font-weight: 600;
+    }
+}
+.left {
+    width: 15%;
+}
+.right {
+    width: 85%;
+    display: flex;
+    justify-content: space-around;
 }
