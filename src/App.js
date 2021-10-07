@@ -20,36 +20,15 @@ function App() {
 
     const handleCheckBox = (e, index) => {
         const {name, checked} = e.target;
-        console.log("e", e);
-        console.log("index", index);
-        console.log("checked", checked);
-        console.log("name", name);
-        console.log(featureFlags);
-// setFeatureFlags([...allOtherFeatures, updatedFeature]);
         const updatedFeatureFlags = featureFlags
             .map(feature => {
-                console.log("feature from MAP", feature);
-                console.log("feature['name'] from MAP", feature["name"]);
-                console.log("name from MAP", name);
                 if (feature["name"] === name) {
                     feature["valueArr"][index] = checked;
-                    console.log("HIT!!!");
                 }
+                return feature;
             });
 
-        console.log("updatedFeatureFlags", updatedFeatureFlags);
-        // setFeatureFlags(featureFlags
-        //     .map(feature => {
-        //         console.log("feature from MAP", feature);
-        //         console.log("feature['name'] from MAP", feature["name"]);
-        //         console.log("name from MAP", name);
-        //         if (feature["name"] === name) {
-        //             feature["valueArr"][index] = checked;
-        //             console.log("HIT!!!");
-        //         }
-        //     })
-        // )
-        // setFeatureFlags([...featureFlags, index["valueArr"] =  updatedFeatureValueArr]);
+        setFeatureFlags(updatedFeatureFlags);
     }
 
   return (
