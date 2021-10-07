@@ -10,10 +10,47 @@ function App() {
     useEffect(() => {
         axios.get("http://localhost:8080/featureflags")
             .then(res => {
+                for (let i = 0; i < res.data.length; i++) {
+                    const dataPoint = res.data[i];
+                    dataPoint["valueArr"] = dataPoint["valueArr"].map(strNum => parseInt(strNum) === 1);
+                }
                 setFeatureFlags(res.data);
-                console.log(res);
             })
     }, [])
+
+    const handleCheckBox = (e, index) => {
+        const {name, checked} = e.target;
+        console.log("e", e);
+        console.log("index", index);
+        console.log("checked", checked);
+        console.log("name", name);
+        console.log(featureFlags);
+// setFeatureFlags([...allOtherFeatures, updatedFeature]);
+        const updatedFeatureFlags = featureFlags
+            .map(feature => {
+                console.log("feature from MAP", feature);
+                console.log("feature['name'] from MAP", feature["name"]);
+                console.log("name from MAP", name);
+                if (feature["name"] === name) {
+                    feature["valueArr"][index] = checked;
+                    console.log("HIT!!!");
+                }
+            });
+
+        console.log("updatedFeatureFlags", updatedFeatureFlags);
+        // setFeatureFlags(featureFlags
+        //     .map(feature => {
+        //         console.log("feature from MAP", feature);
+        //         console.log("feature['name'] from MAP", feature["name"]);
+        //         console.log("name from MAP", name);
+        //         if (feature["name"] === name) {
+        //             feature["valueArr"][index] = checked;
+        //             console.log("HIT!!!");
+        //         }
+        //     })
+        // )
+        // setFeatureFlags([...featureFlags, index["valueArr"] =  updatedFeatureValueArr]);
+    }
 
   return (
     <div className="container">
@@ -48,8 +85,8 @@ function App() {
                                 <h3 className="labels">{featureFlag["name"]}</h3>
                             </div>
                             <div className="right">
-                                {featureFlag["valueArr"].map(value => (
-                                    <input type="checkbox" value={parseInt(value) === 1} />
+                                {featureFlag["valueArr"].map((value, index) => (
+                                    <input name={featureFlag["name"]} type="checkbox" checked={value} onChange={(e) => handleCheckBox(e, index)} />
                                 ))}
                             </div>
                         </div>
