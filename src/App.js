@@ -6,53 +6,69 @@ import "./App.scss";
 function App() {
 
     const [featureFlags, setFeatureFlags] = useState([]);
-    const [originalFeatureFlags, setOriginalFeatureFlags] = useState([]);
+    const [featureFlagsMap, setFeatureFlagsMap] = useState({});
 
+    const prepareFeatureList = (featureFlagsList) => {
+        let localFeatureFlagsMap = {};
+        for (let i = 0; i < featureFlagsList.length; i++) {
+            const featureObj = {};
+            const dataPoint = featureFlagsList[i];
+            dataPoint["valueArr"] = dataPoint["valueArr"].map(strNum => parseInt(strNum) === 1);
+            for (let f = 0; f < dataPoint["valueArr"].length; f++) {
+                featureObj[dataPoint["name"] + f] = dataPoint["valueArr"][f];
+            }
+            localFeatureFlagsMap = {...localFeatureFlagsMap, ...featureObj};
+        }
+        setFeatureFlags(featureFlagsList);
+        setFeatureFlagsMap({...localFeatureFlagsMap});
+    }
 
     const fetchFeatureFlags = () => {
         axios.get("http://localhost:8080/featureflags")
             .then(res => {
-                const originalFeatureFlagsList = [];
-                for (let i = 0; i < res.data.length; i++) {
-                    const dataPoint = res.data[i];
-                    dataPoint["valueArr"] = dataPoint["valueArr"].map(strNum => parseInt(strNum) === 1);
-                    originalFeatureFlagsList.push(dataPoint);
-                }
-                setFeatureFlags(res.data);
-                setOriginalFeatureFlags([...originalFeatureFlagsList]);
+                prepareFeatureList(res.data);
             })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
-    const findChangesMade = (newFeatureFlags, originalFeatureFlags) => {
+    const updateFeatures = () => {
+        let featuresToBeChanged = findChangesMade();
+
+        if (featuresToBeChanged.length > 0) {
+            for (let y = 0; y < featuresToBeChanged.length; y++) {
+                for (let z = 0; z < featuresToBeChanged[y]["valueArr"].length; z++) {
+                    if (featuresToBeChanged[y]["valueArr"][z]) {
+                        featuresToBeChanged[y]["valueArr"][z] = "1";
+                    } else {
+                        featuresToBeChanged[y]["valueArr"][z] = "0";
+                    }
+                }
+            }
+
+            axios.post("http://localhost:8080/featureflags", featuresToBeChanged)
+                .then(res => {
+                    prepareFeatureList(res.data);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    }
+
+    const findChangesMade = () => {
         const changedList = [];
-        for (let i = 0; i < originalFeatureFlags.length; i++) {
-            for (let x = 0; x < originalFeatureFlags[i]["valueArr"].length; x++) {
+        for (let i = 0; i < featureFlags.length; i++) {
+            for (let y = 0; y < featureFlags[i]["valueArr"].length; y++) {
 
-                console.log("newFeatureFlags[i][\"name\"]", newFeatureFlags[i]["name"])
-                console.log("newFeatureFlags[i]['valueArr'][x] | ", newFeatureFlags[i]["valueArr"][x]);
-                console.log("originalFeatureFlags[i]['valueArr'][x]) | ", originalFeatureFlags[i]['valueArr'][x]);
-                console.log("originalFeatureFlags[i]['valueArr'][x] == newFeatureFlags[i]['valueArr'][x] | ", originalFeatureFlags[i]["valueArr"][x] === newFeatureFlags[i]["valueArr"][x]);
-
-                if (newFeatureFlags[i]["valueArr"][x] !== (parseInt(originalFeatureFlags[i]["valueArr"][x]) === 1)) {
-                    changedList.push(newFeatureFlags[i]);
+                if (featureFlags[i]["valueArr"][y] !== featureFlagsMap[featureFlags[i]["name"] + y]) {
+                    changedList.push(featureFlags[i]);
                 }
             }
         }
         return changedList;
     }
-
-    // console.log("originalFeatureFlags == featureFlags ||", originalFeatureFlags == featureFlags);
-    // console.log("originalFeatureFlags ||", originalFeatureFlags);
-    // console.log("featureFlags ||", featureFlags);
-
-    //
-    // const updateOrInsertFeatureFlag
-
-    useEffect(() => {
-        if (featureFlags.length === 0) {
-            fetchFeatureFlags();
-        }
-    }, [])
 
     const handleCheckBox = (e, index) => {
         const name = e.target.name;
@@ -68,10 +84,14 @@ function App() {
     }
 
     const handleCancel = () => {
-        if (findChangesMade(featureFlags, originalFeatureFlags).length > 0) {
+        if (findChangesMade().length > 0) {
             fetchFeatureFlags();
         }
     }
+
+    useEffect(() => {
+        fetchFeatureFlags();
+    }, [])
 
   return (
     <div className="container">
@@ -115,7 +135,7 @@ function App() {
                 <div className="button-row row-border">
                     <div className="button-container">
                         <div className="button" onClick={handleCancel}>Cancel</div>
-                        <div className="button save">Save</div>
+                        <div className="button save" onClick={updateFeatures}>Save</div>
                     </div>
                 </div>
             </div>
